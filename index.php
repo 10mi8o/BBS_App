@@ -2,6 +2,10 @@
 
 $dataFile = 'bbs.dat';
 
+function h($s){
+  return htmlspecialchars($s, ENT_QUOTES, 'utf-8');
+}
+
 if($_SERVER['REQUEST_METHOD'] == 'POST' &&
 isset($_POST['content']) &&
 isset($_POST['user'])){
@@ -23,6 +27,9 @@ isset($_POST['user'])){
     fclose($fp);
   }
 }
+
+$posts = file($dataFile, FILE_IGNORE_NEW_LINES);
+$posts = array_reverse($posts);
 
 ?>
 
@@ -47,9 +54,18 @@ isset($_POST['user'])){
       </div>
       <input type="submit" value="投稿する">
     </form>
-    <h2 class="subHeading">一覧</h2>
+    <h2 class="subHeading">一覧(<?php echo count($posts); ?>)件</h2>
     <ul>
+      <?php if(count($posts)) : ?>
+        <?php foreach ($posts as $post) : ?>
+        <?php list($content, $user, $postedTime) = explode("\t", $post); ?>
+        <li>
+          <?php echo h($content); ?> (<?php echo h($user); ?>) - <?php echo h($postedTime); ?>
+        </li>
+        <?php endforeach; ?>
+      <?php else : ?>
       <li>投稿はありません</li>
+      <?php endif; ?>
     </ul>
   </div>
 
