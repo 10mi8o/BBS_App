@@ -2,6 +2,20 @@
 
 $dataFile = 'bbs.dat';
 
+session_start();
+
+function setToken(){
+  $token = sha1(uniqid(mt_rand(), true));
+  $_SESSION['token'] = $token;
+}
+
+function checkToken(){
+  if(empty($_SESSION['token']) || ($_SESSION['token'] != $_POST['token'])){
+    echo "不正なPOSTが行われました";
+    exit;
+  }
+}
+
 function h($s){
   return htmlspecialchars($s, ENT_QUOTES, 'utf-8');
 }
@@ -9,6 +23,8 @@ function h($s){
 if($_SERVER['REQUEST_METHOD'] == 'POST' &&
 isset($_POST['content']) &&
 isset($_POST['user'])){
+
+  checkToken();
 
   $content = trim($_POST['content']);
   $user = trim($_POST['user']);
@@ -26,6 +42,8 @@ isset($_POST['user'])){
     fwrite($fp, $newDate);
     fclose($fp);
   }
+}else {
+  setToken();
 }
 
 $posts = file($dataFile, FILE_IGNORE_NEW_LINES);
@@ -47,12 +65,13 @@ $posts = array_reverse($posts);
     <h1 class="heading">掲示板</h1>
     <form class="formArea" method="post">
       <div class="inputField">
-        <label for="content">content: </label><input id="content" type="text" name="content">
+      <label for="content">content: </label><input id="content" type="text" name="content">
       </div>
       <div class="inputField">
       <label for="user">user: </label><input id="user" type="text" name="user">
       </div>
       <input type="submit" value="投稿する">
+      <input type="hidden" name="token" value="<?php echo h($_SESSION['token']); ?>">
     </form>
     <h2 class="subHeading">一覧(<?php echo count($posts); ?>)件</h2>
     <ul>
