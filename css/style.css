@@ -63,6 +63,11 @@ table {
   border-bottom: 1px solid #ddd;
 }
 
+.subHeading {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+
 .formArea {
   margin-bottom: 20px;
 }
