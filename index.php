@@ -2,17 +2,27 @@
 
 $dataFile = 'bbs.dat';
 
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
+if($_SERVER['REQUEST_METHOD'] == 'POST' &&
+isset($_POST['content']) &&
+isset($_POST['user'])){
 
-  $content = $_POST['content'];
-  $user = $_POST['user'];
+  $content = trim($_POST['content']);
+  $user = trim($_POST['user']);
 
-  $newDate = $content . "\t" . $user . "\n";
+  if($content !== ''){
+    $user = ($user === '') ? 'NoName' : $user;
+
+    $content = str_replace("\t", ' ', $content);
+    $user = str_replace("\t", ' ', $user);
+
+    $postedTime = date('Y-m-d H:i:s');
+
+    $newDate = $content . "\t" . $user . "\t" . $postedTime . "\n";
+    $fp = fopen($dataFile, 'a');
+    fwrite($fp, $newDate);
+    fclose($fp);
+  }
 }
-
-$fp = fopen($dataFile, 'a');
-fwrite($fp, $newDate);
-fclose($fp);
 
 ?>
 
